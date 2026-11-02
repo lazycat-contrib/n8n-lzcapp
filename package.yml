@@ -1,0 +1,18 @@
+package: community.lazycat.app.n8n
+name: n8n
+version: 0.0.0
+description: "Workflow automation: connect apps and APIs visually, self-hosted with 400+ integrations."
+min_os_version: "1.5.0"
+homepage: https://n8n.io/
+author: n8n GmbH
+license: Sustainable Use License 1.0
+permissions:
+  required:
+    - net.internet
+locales:
+  zh:
+    name: n8n
+    description: "可视化工作流自动化：把应用和接口连起来，内置四百多个集成，数据留在自己机器上。"
+  en:
+    name: n8n
+    description: "Workflow automation: connect apps and APIs visually, self-hosted with 400+ integrations."

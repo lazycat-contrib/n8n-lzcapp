@@ -1,0 +1,69 @@
+application:
+  subdomain: n8n
+  multi_instance: false
+  upstreams:
+    - location: /package-licenses/
+      backend: file:///lzcapp/pkg/content/licenses/
+    - location: /
+      backend: http://n8n:5678/
+
+services:
+  n8n:
+    # upstream: n8nio/n8n:2.46.4
+    image: docker.1ms.run/n8nio/n8n:2.46.4
+    environment:
+      # Encrypts stored credentials; if it changes, saved connections become
+      # unreadable. Platform stable secret keeps it constant across restarts.
+      - |-
+        N8N_ENCRYPTION_KEY={{ stable_secret "n8n_encryption_key" | replace "\r" "" | replace "\n" "" }}
+      - N8N_HOST={{ .S.AppDomain }}
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      # Webhook URLs are absolute and are what external services call back on.
+      # N8N_WEBHOOK_URL is the current name -- WEBHOOK_URL was deprecated in
+      # n8n 2.35.0 and now logs a warning.
+      - |-
+        N8N_WEBHOOK_URL=https://{{ .S.AppDomain }}/
+      - |-
+        N8N_EDITOR_BASE_URL=https://{{ .S.AppDomain }}/
+      # SQLite keeps this a single container; the file lives in the mount below.
+      - DB_TYPE=sqlite
+      - DB_SQLITE_POOL_SIZE=5
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_PERSONALIZATION_ENABLED=false
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - GENERIC_TIMEZONE=Asia/Shanghai
+      - TZ=Asia/Shanghai
+    binds:
+      - /lzcapp/var/n8n:/home/node/.n8n
+
+usage: |
+  n8n 是可视化工作流自动化平台：把各种应用和接口连起来，自动完成重复的事。
+
+  使用方法：
+  1. 打开应用，**首次会进入创建管理员向导**，填邮箱和密码
+     （这一步由你自己完成，包内没有内置口令）。
+  2. 点"新建工作流"，从触发器开始：定时、Webhook，或某个应用里的事件。
+  3. 往下拖节点串成流程，比如"收到表单 → 写进数据库 → 发通知"。
+  4. 保存并激活，之后每次触发都会留下执行记录，可逐步回看每个节点的输入输出。
+  5. 外部服务回调用的地址是 https://你的域名/webhook/...，界面里会直接给出。
+
+  数据与安全：
+  - 工作流、凭据和 SQLite 数据库都在 /lzcapp/var/n8n，卸载应用会一并删除，请定期备份
+    （也可以在界面里导出工作流 JSON 存档）。
+  - 管理员账号由你首次启动时创建，不存在内置弱口令。
+  - 加密密钥由平台稳定密钥生成，每个部署不同；**请勿改动**，
+    否则已保存的凭据将无法解密。
+  - 应用经懒猫入口鉴权访问；webhook 地址已指向 https 域名，外部可正常回调。
+
+  说明：
+  - 单容器部署，使用内置 SQLite，无需额外数据库。
+  - 首次启动会初始化数据库，打开可能需要等一会儿。
+  - 未配置外部数据库与队列模式，因此不适合多实例横向扩展，单机使用不受影响。
+  - 许可说明：n8n 使用 Sustainable Use License 1.0（源码另含部分企业目录条款）。
+    该许可授予使用、复制、分发等权利，条件是**仅可免费、非商业地分发**；
+    本商店的分发符合该条件，并原样附带许可全文，未做任何修改。
+  - 未做真机验证：创建管理员、建工作流、触发执行、webhook 回调以及重启后持久化
+    均未在设备上实测。
