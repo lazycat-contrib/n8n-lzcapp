@@ -6,11 +6,10 @@ application:
       backend: file:///lzcapp/pkg/content/licenses/
     - location: /
       backend: http://n8n:5678/
-
 services:
   n8n:
-    # upstream: n8nio/n8n:2.46.4
-    image: docker.1ms.run/n8nio/n8n:2.46.4
+    # upstream: n8nio/n8n:3.0.1
+    image: docker.1ms.run/n8nio/n8n:3.0.1
     environment:
       # Encrypts stored credentials; if it changes, saved connections become
       # unreadable. Platform stable secret keeps it constant across restarts.
@@ -38,7 +37,6 @@ services:
       - TZ=Asia/Shanghai
     binds:
       - /lzcapp/var/n8n:/home/node/.n8n
-
 usage: |
   n8n 是可视化工作流自动化平台：把各种应用和接口连起来，自动完成重复的事。
 
