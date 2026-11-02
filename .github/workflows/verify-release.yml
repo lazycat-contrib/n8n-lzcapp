@@ -119,7 +119,11 @@ jobs:
                   license_text = content.extractfile(target).read().decode()
               # the shipped licence text must be the upstream one, unabridged
               assert 'Sustainable Use License' in license_text, license_text[:200]
-              assert 'free of charge for non-commercial purposes' in license_text, 'redistribution clause missing'
+              # the clause wraps across a line break upstream, so collapse
+              # whitespace before matching
+              flat = ' '.join(license_text.split())
+              assert 'free of charge for non-commercial purposes' in flat, 'redistribution clause missing'
+              assert 'use, copy, distribute, make available' in flat, 'distribution grant missing'
 
           result = {
               'verified': True,
