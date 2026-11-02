@@ -1,6 +1,6 @@
 package: community.lazycat.app.n8n
 name: n8n
-version: 3.0.1
+version: 0.0.0
 description: "Workflow automation: connect apps and APIs visually, self-hosted with 400+ integrations."
 min_os_version: "1.5.0"
 homepage: https://n8n.io/
