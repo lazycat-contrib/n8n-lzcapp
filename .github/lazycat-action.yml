@@ -21,8 +21,12 @@ images:
     source: n8nio/n8n
     channel: stable
     sort: semver
-    # tags include v3-rc-*, next, beta and -pc variants -- keep to plain x.y.z
-    tag_regex: ^[0-9]+[.][0-9]+[.][0-9]+$
+    # Tags include v3-rc-*, next, beta and -pc variants. Plain x.y.z is not
+    # enough either: every 3.x image carries N8N_RELEASE_TYPE=rc (checked on
+    # 3.0.0 / 3.0.1), while 2.46.x is N8N_RELEASE_TYPE=stable and is what the
+    # "latest" tag points at. Semver ordering alone would pick the RC line, so
+    # pin the major version to the stable series.
+    tag_regex: ^2[.][0-9]+[.][0-9]+$
     delivery:
       mode: mirror
       require_digest_match: true
